@@ -32,7 +32,7 @@ struct OnboardingWelcomeStepView: View {
                 Text("Welcome to WolfWave")
                     .font(.system(size: 24, weight: .bold))
 
-                Text("Connect Apple Music to Twitch")
+                Text("Bridge Apple Music to your stream")
                     .font(.system(size: 15))
                     .foregroundStyle(.secondary)
             }
@@ -50,9 +50,14 @@ struct OnboardingWelcomeStepView: View {
                     description: "Viewers can use !song and !last commands to see what you're playing."
                 )
                 featureRow(
-                    icon: "menubar.rectangle",
-                    title: "Menu Bar App",
-                    description: "Lives in your menu bar for quick access without getting in the way."
+                    icon: "gamecontroller.fill",
+                    title: "Discord Rich Presence",
+                    description: "Shows what you're listening to on your Discord profile."
+                )
+                featureRow(
+                    icon: "rectangle.inset.filled.and.person.filled",
+                    title: "OBS Stream Widget",
+                    description: "Display now-playing info as a browser source overlay on your stream."
                 )
             }
             .padding(.horizontal, 32)

@@ -45,6 +45,7 @@ struct AppVisibilitySettingsView: View {
                 .accessibilityLabel("Show app in")
                 .accessibilityIdentifier("dockVisibilityPicker")
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(AppConstants.SettingsUI.cardPadding)
             .background(Color(nsColor: .controlBackgroundColor))
             .clipShape(RoundedRectangle(cornerRadius: AppConstants.SettingsUI.cardCornerRadius))
