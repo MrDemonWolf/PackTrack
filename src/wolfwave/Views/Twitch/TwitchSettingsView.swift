@@ -264,7 +264,8 @@ struct TwitchSettingsView: View {
                         onClearCredentials: { viewModel.clearCredentials() },
                         onJoinChannel: { viewModel.joinChannel() },
                         onLeaveChannel: { viewModel.leaveChannel() },
-                        onChannelIDChanged: { viewModel.saveChannelID() }
+                        onChannelIDChanged: { viewModel.saveChannelID() },
+                        onReauth: { viewModel.clearCredentials(); viewModel.startOAuth() }
                     )
 
                 case .error(let message):
@@ -302,6 +303,7 @@ private struct SignedInView: View {
     var onJoinChannel: () -> Void
     var onLeaveChannel: () -> Void
     var onChannelIDChanged: () -> Void
+    var onReauth: () -> Void
     @State private var showingDisconnectConfirmation = false
 
     var body: some View {
@@ -402,38 +404,51 @@ private struct SignedInView: View {
 
     private var actionButtonsSection: some View {
         HStack(spacing: 10) {
-            Button(action: {
-                if isChannelConnected {
-                    showingDisconnectConfirmation = true
-                } else {
-                    onJoinChannel()
+            if reauthNeeded {
+                Button(action: onReauth) {
+                    Label("Re-auth", systemImage: "arrow.clockwise.circle.fill")
+                        .font(.system(size: 12, weight: .medium))
                 }
-            }) {
-                if isConnecting {
-                    HStack(spacing: 6) {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .controlSize(.mini)
-                        Text("Connecting...")
-                            .font(.system(size: 12))
+                .buttonStyle(.bordered)
+                .tint(.orange)
+                .controlSize(.small)
+                .pointerCursor()
+                .accessibilityLabel("Re-authorize Twitch account")
+                .accessibilityIdentifier("twitchReauthButton")
+            } else {
+                Button(action: {
+                    if isChannelConnected {
+                        showingDisconnectConfirmation = true
+                    } else {
+                        onJoinChannel()
                     }
-                } else {
-                    Label(
-                        isChannelConnected ? "Disconnect" : "Connect",
-                        systemImage: isChannelConnected
-                            ? "xmark.circle.fill" : "checkmark.circle.fill"
-                    )
-                    .font(.system(size: 12, weight: .medium))
+                }) {
+                    if isConnecting {
+                        HStack(spacing: 6) {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                                .controlSize(.mini)
+                            Text("Connecting...")
+                                .font(.system(size: 12))
+                        }
+                    } else {
+                        Label(
+                            isChannelConnected ? "Disconnect" : "Connect",
+                            systemImage: isChannelConnected
+                                ? "xmark.circle.fill" : "checkmark.circle.fill"
+                        )
+                        .font(.system(size: 12, weight: .medium))
+                    }
                 }
+                .disabled(shouldDisableConnectButton)
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .pointerCursor()
+                .accessibilityLabel(
+                    isChannelConnected ? "Disconnect from channel" : "Connect to channel"
+                )
+                .accessibilityIdentifier("twitchConnectButton")
             }
-            .disabled(shouldDisableConnectButton)
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-            .pointerCursor()
-            .accessibilityLabel(
-                isChannelConnected ? "Disconnect from channel" : "Connect to channel"
-            )
-            .accessibilityIdentifier("twitchConnectButton")
 
             Spacer()
 
@@ -463,7 +478,7 @@ private struct SignedInView: View {
 
     private var shouldDisableConnectButton: Bool {
         let validChannel = !channelID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        if reauthNeeded || isConnecting { return true }
+        if isConnecting { return true }
         // If credentials are saved we can attempt to connect even if the
         // bot username hasn't been resolved yet — rely on saved token.
         if credentialsSaved {
