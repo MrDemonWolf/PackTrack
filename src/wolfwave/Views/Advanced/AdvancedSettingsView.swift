@@ -49,6 +49,18 @@ struct AdvancedSettingsView: View {
                     .foregroundStyle(.secondary)
             }
 
+            // Music Monitor
+            MusicMonitorSettingsView()
+
+            Divider()
+                .padding(.vertical, 4)
+
+            // App Visibility
+            AppVisibilitySettingsView()
+
+            Divider()
+                .padding(.vertical, 4)
+
             // Onboarding Card
             VStack(alignment: .leading, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {

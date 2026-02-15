@@ -47,32 +47,27 @@ struct SettingsView: View {
     
     /// Navigation sections in the settings sidebar.
     enum SettingsSection: String, CaseIterable, Identifiable {
-        case musicMonitor = "Music Monitor"
-        case appVisibility = "App Visibility"
         case websocket = "OBS Widget"
         case twitchIntegration = "Twitch Integration"
-        case discord = "Discord"
+        case discord = "Discord Integration"
         case advanced = "Advanced"
-        
+
         var id: String { rawValue }
-        
+
         /// System SF Symbol name for sidebar icon (or nil for custom image).
         var systemIcon: String? {
             switch self {
-            case .musicMonitor: return "music.note"
-            case .appVisibility: return "eye"
             case .websocket: return "dot.radiowaves.left.and.right"
             case .twitchIntegration: return nil // Uses custom image
             case .discord: return "gamecontroller"
             case .advanced: return "gearshape"
             }
         }
-        
+
         /// Custom image name for sidebar icon (or nil for system icon).
         var customIcon: String? {
             switch self {
             case .twitchIntegration: return "TwitchLogo"
-            case .discord: return nil
             default: return nil
             }
         }
@@ -119,7 +114,7 @@ struct SettingsView: View {
     @State private var showingResetAlert = false
     
     /// Currently selected settings section
-    @State private var selectedSection: SettingsSection = .musicMonitor
+    @State private var selectedSection: SettingsSection = .twitchIntegration
     
     /// Controls sidebar visibility
     @State private var sidebarVisibility: NavigationSplitViewVisibility = .all
@@ -209,10 +204,6 @@ struct SettingsView: View {
     @ViewBuilder
     private func detailView(for section: SettingsSection) -> some View {
         switch section {
-        case .musicMonitor:
-            MusicMonitorSettingsView()
-        case .appVisibility:
-            AppVisibilitySettingsView()
         case .websocket:
             WebSocketSettingsView()
         case .twitchIntegration:
